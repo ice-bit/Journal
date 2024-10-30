@@ -1,3 +1,6 @@
+![image](https://github.com/user-attachments/assets/8104c926-13a5-4423-a577-80f8ac69f25b)
+Image generated using DALL-E.
+
 # Journal App
 
 A simple journal app built with Swift, UIKit, and Core Data, utilizing the Model-View-ViewModel (MVVM) architecture pattern. The app allows users to create, read, and manage journal entries.
