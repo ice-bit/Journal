@@ -12,8 +12,9 @@ import Combine
 protocol JournalViewModelProtocol {
     var entriesPublisher: Published<[Entry]>.Publisher { get }
     var entries: [Entry] { get }
-    func fetchEntries()
     func addEntry(with title: String, body content: String)
+    func fetchEntries()
+    func updateEntry(_ entry: Entry, with title: String, body content: String)
     func deleteEntry(at index: Int)
 }
 
@@ -30,18 +31,6 @@ class JournalViewModel: ObservableObject, JournalViewModelProtocol {
         $entries
     }
     
-    // Fetch entries from core data
-    func fetchEntries() {
-        let fetchRequest: NSFetchRequest<Entry> = Entry.fetchRequest()
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "date", ascending: false)]
-        
-        do {
-            entries = try context.fetch(fetchRequest)
-        } catch {
-            print("Failed to fetch entries: \(error)")
-        }
-    }
-    
     // Add entry
     func addEntry(with title: String, body content: String) {
         let newEntry = Entry(context: context)
@@ -54,6 +43,35 @@ class JournalViewModel: ObservableObject, JournalViewModelProtocol {
             entries.insert(newEntry, at: 0) // Insert at the beginning
         } catch {
             print("Failed to save new entry: \(error)")
+        }
+    }
+    
+    // Fetch entries from core data
+    func fetchEntries() {
+        let fetchRequest: NSFetchRequest<Entry> = Entry.fetchRequest()
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "date", ascending: false)]
+        
+        do {
+            entries = try context.fetch(fetchRequest)
+        } catch {
+            print("Failed to fetch entries: \(error)")
+        }
+    }
+    
+    // Update entry
+    func updateEntry(_ entry: Entry, with title: String, body content: String) {
+        entry.title = title
+        entry.content = content
+        entry.date = Date()
+        
+        do {
+            try context.save()
+            // Reflect the changes in the entries array by re-fetching or manually updating the array
+            if let index = entries.firstIndex(of: entry) {
+                entries[index] = entry
+            }
+        } catch {
+            print("Failed to update entry: \(error)")
         }
     }
     
